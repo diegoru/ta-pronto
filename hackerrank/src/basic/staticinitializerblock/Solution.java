@@ -1,4 +1,4 @@
-package introducion.staticinitializerblock;
+package basic.staticinitializerblock;
 
 import java.util.Scanner;
 

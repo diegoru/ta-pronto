@@ -1,4 +1,4 @@
-package introducion.javaendoffile;
+package basic.javaendoffile;
 
 import java.util.Scanner;
 

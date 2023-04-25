@@ -1,7 +1,6 @@
-package introducion.javaloops2;
+package basic.javaloops2;
 
 import java.util.*;
-import java.io.*;
 
 class Solution {
     public static void main(String[] argh) {

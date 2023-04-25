@@ -1,4 +1,4 @@
-package introducion.javadateandtime;
+package basic.javadateandtime;
 
 import java.io.*;
 import java.text.DateFormat;

@@ -1,7 +1,6 @@
-package introducion.javadatatypes;
+package basic.javadatatypes;
 
 import java.util.*;
-import java.io.*;
 
 
 class Solution {
