@@ -10,6 +10,14 @@ public class Solution
         int testCases = Integer.parseInt(in.nextLine());
         while(testCases>0){
             String pattern = in.nextLine();
+            try {
+                Pattern.compile(pattern);
+                System.out.println("Valid");
+            } catch (Exception e) {
+                System.out.println("Invalid");
+            }finally {
+                testCases--;
+            }
             //Write your code
         }
     }
