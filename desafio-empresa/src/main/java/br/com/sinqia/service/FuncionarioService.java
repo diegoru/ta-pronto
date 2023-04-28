@@ -2,6 +2,7 @@ package br.com.sinqia.service;
 
 import br.com.sinqia.model.Funcionario;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface FuncionarioService {
@@ -10,4 +11,5 @@ public interface FuncionarioService {
     Funcionario save(Funcionario funcionario);
     Funcionario update(Long id, Funcionario funcionario);
     void delete(Long id);
+    BigDecimal getPagamento(Long id);
 }

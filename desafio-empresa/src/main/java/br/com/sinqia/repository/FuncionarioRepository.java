@@ -9,8 +9,8 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class FuncionarioRepository {
 
-    private static List<Funcionario> funcionarios = new ArrayList<>();
-    private static AtomicLong counter = new AtomicLong();
+    private static final List<Funcionario> funcionarios = new ArrayList<>();
+    private static final AtomicLong counter = new AtomicLong();
 
     public List<Funcionario> findAll() {
         return funcionarios;
@@ -18,7 +18,7 @@ public class FuncionarioRepository {
 
     public Funcionario findById(Long id) {
         return funcionarios.stream()
-                .filter(id::equals)
+                .filter(idFuncionario -> id.equals(idFuncionario.getId()))
                 .findAny()
                 .orElseThrow(FuncionarioNaoEncontradoException::new);
     }
