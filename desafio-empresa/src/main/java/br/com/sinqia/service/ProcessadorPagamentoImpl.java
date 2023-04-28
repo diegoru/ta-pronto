@@ -1,6 +1,6 @@
 package br.com.sinqia.service;
 
-import br.com.sinqia.exception.ErroProcessamentoPagamentoException;
+import br.com.sinqia.exception.FuncionarioSemSalarioException;
 import br.com.sinqia.model.Funcionario;
 import br.com.sinqia.model.PagamentoRealizado;
 
@@ -12,7 +12,7 @@ public class ProcessadorPagamentoImpl implements ProcessadorPagamento {
     public PagamentoRealizado processar(Long id) {
         Funcionario funcionario = funcionarioService.findById(id);
         if (funcionario.getSalario() == null) {
-            throw new ErroProcessamentoPagamentoException("Funcionario sem salario");
+            throw new FuncionarioSemSalarioException();
         }
         return new PagamentoRealizado(funcionario, funcionarioService.getPagamento(id));
     }

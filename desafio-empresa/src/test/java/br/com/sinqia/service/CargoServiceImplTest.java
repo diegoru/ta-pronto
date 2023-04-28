@@ -47,7 +47,7 @@ class CargoServiceImplTest {
     void deveRetornarCargoNaoEncontradoExceptionUpdate() {
         assertThrows(CargoNaoEncontradoException.class, () -> {
             Cargo cargo = new Cargo("Coordenador", 0.1);
-            cargoService.update(4L, cargo);
+            cargoService.update(5L, cargo);
         });
     }
 
