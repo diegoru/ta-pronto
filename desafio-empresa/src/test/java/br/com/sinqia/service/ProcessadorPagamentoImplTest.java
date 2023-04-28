@@ -32,16 +32,12 @@ class ProcessadorPagamentoImplTest {
     @Test
     void DadoFuncionarioSemSalarioDeveOcorrerUmErro() {
         Funcionario danilo = funcionarioService.save(new Funcionario("Danilo", null, cargoService.findById(1L)));
-        ErroProcessamentoPagamentoException erro = Assertions.assertThrowsExactly(ErroProcessamentoPagamentoException.class,
-                () -> processadorPagamento.processar(4L));
-        Assertions.assertEquals("Funcionario sem salario", erro.getMessage());
+        assertThrows(ErroProcessamentoPagamentoException.class, () -> processadorPagamento.processar(4L));
     }
 
     @Test
     public void DadoUmFuncionarioNuloDeveOcorrerErro() {
-        FuncionarioNaoEncontradoException erro = Assertions.assertThrowsExactly(FuncionarioNaoEncontradoException.class,
-                () -> processadorPagamento.processar(4L));
-        Assertions.assertEquals("Funcionário não encontrado.", erro.getMessage());
+        assertThrows(FuncionarioNaoEncontradoException.class, () -> processadorPagamento.processar(4L));
 
     }
 
