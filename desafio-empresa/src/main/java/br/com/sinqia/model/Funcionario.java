@@ -8,7 +8,6 @@ import java.math.BigDecimal;
 
 @Getter
 @Setter
-@AllArgsConstructor
 public class Funcionario {
 
     private Long id;

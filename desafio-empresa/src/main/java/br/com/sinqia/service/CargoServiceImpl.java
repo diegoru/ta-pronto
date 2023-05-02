@@ -6,7 +6,12 @@ import br.com.sinqia.repository.CargoRepository;
 import java.util.List;
 
 public class CargoServiceImpl implements CargoService {
-    private final CargoRepository cargoRepository = new CargoRepository();
+
+    private CargoRepository cargoRepository;
+
+    public CargoServiceImpl() {
+        this.cargoRepository = new CargoRepository();
+    }
 
     @Override
     public List<Cargo> findAll() {
