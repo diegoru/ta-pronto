@@ -2,12 +2,15 @@ package br.com.sinqia.service;
 
 import br.com.sinqia.model.Funcionario;
 import br.com.sinqia.repository.FuncionarioRepository;
+import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.List;
 
+@RequiredArgsConstructor
 public class FuncionarioServiceImpl implements FuncionarioService {
-    private final FuncionarioRepository funcionarioRepository = new FuncionarioRepository();
+
+    private final FuncionarioRepository funcionarioRepository;
 
 
     @Override

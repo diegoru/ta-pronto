@@ -48,13 +48,13 @@ class CargoServiceImplTest {
 
 
     @Test
-    void deveRetornarCargoNaoEncontradoException() {
+    public void deveRetornarCargoNaoEncontradoException() {
         Mockito.when(cargoRepository.findById(Mockito.anyLong())).thenThrow(CargoNaoEncontradoException.class);
         assertThrows(CargoNaoEncontradoException.class, () -> cargoService.findById(1L));
     }
 
     @Test
-    void deveRetornarCargoCadastrado() {
+    public void deveRetornarCargoCadastrado() {
         Cargo cargo = new Cargo();
         cargo.setId(1L);
         cargo.setDescricao("Desenvolvedor");
@@ -65,7 +65,7 @@ class CargoServiceImplTest {
 
 
     @Test
-    void deveRetornarCargoUpdate() {
+    public void deveRetornarCargoUpdate() {
         Cargo cargo = new Cargo();
         cargo.setId(1L);
         cargo.setDescricao("Desenvolvedor");
@@ -80,7 +80,7 @@ class CargoServiceImplTest {
     }
 
     @Test
-    void deveRetornarCargoNaoEncontradoExceptionUpdate() {
+    public void deveRetornarCargoNaoEncontradoExceptionUpdate() {
         Cargo cargoAtualizado = new Cargo();
         cargoAtualizado.setDescricao("Desenvolvedor");
         cargoAtualizado.setAliquota(0.10);
@@ -90,14 +90,8 @@ class CargoServiceImplTest {
     }
 
     @Test
-    public void deveriaRetornarClienteDeletado() {
-        Cargo cargo = new Cargo();
-        cargo.setId(1L);
-        cargo.setDescricao("Desenvolvedor");
-        cargo.setAliquota(0.05);
-
+    public void deveRetornarClienteDeletado() {
         cargoService.delete(1L);
-
         Mockito.verify(cargoRepository).delete(1L);
     }
 }
