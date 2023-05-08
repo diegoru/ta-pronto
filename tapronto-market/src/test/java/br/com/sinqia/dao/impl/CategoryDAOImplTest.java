@@ -1,5 +1,7 @@
 package br.com.sinqia.dao.impl;
 
+import br.com.sinqia.dao.CategoryDAO;
+import br.com.sinqia.dao.DaoFactory;
 import br.com.sinqia.db.DB;
 import br.com.sinqia.exceptions.DbException;
 import br.com.sinqia.model.Category;
@@ -14,20 +16,14 @@ import static org.junit.jupiter.api.Assertions.*;
 class CategoryDAOImplTest {
 
     private static Connection conn;
-    private static CategoryDAOImpl dao;
+    private static CategoryDAO dao;
 
     @BeforeAll
     public static void start() throws SQLException {
         conn = DB.getConnection();
-        dao = new CategoryDAOImpl(conn);
-        initializationBD();
+        dao = DaoFactory.createCategoryDao();
+        initializationDataBase();
     }
-
-    @AfterAll
-    public static void end() throws SQLException {
-        DB.closeConnetion();
-    }
-
     @Test
     @DisplayName("Deve inserir categoria no banco de dados")
     public void insertTest() {
@@ -66,11 +62,37 @@ class CategoryDAOImplTest {
         assertDoesNotThrow(() -> dao.findAll());
     }
 
-    private static void initializationBD() throws SQLException {
-        PreparedStatement stTruncate = conn.prepareStatement("TRUNCATE TABLE category");
-        stTruncate.executeUpdate();
-        PreparedStatement stInsert = conn.prepareStatement("INSERT INTO category (name) VALUES (?)");
-        stInsert.setString(1, "teste");
-        stInsert.executeUpdate();
+    public static void initializationDataBase() throws SQLException {
+        String dropTables = "DROP TABLE product, category";
+        String createTableCategory =
+                "CREATE TABLE category ( "
+                + "id BIGINT NOT NULL AUTO_INCREMENT, "
+                + "name VARCHAR(60) NOT NULL, "
+                + "PRIMARY KEY (id))";
+
+        String createTableProduct =
+                "CREATE TABLE product( " +
+                        "id BIGINT NOT NULL AUTO_INCREMENT, " +
+                        "name VARCHAR(255) NOT NULL, " +
+                        "price DECIMAL(5,2) NOT NULL, " +
+                        "category_id BIGINT NOT NULL, " +
+                        "PRIMARY KEY (id), " +
+                        "FOREIGN KEY (category_id) REFERENCES category (id) )";
+
+        PreparedStatement st = null;
+
+        st = conn.prepareStatement(dropTables);
+        st.executeUpdate();
+        st = conn.prepareStatement(createTableCategory);
+        st.executeUpdate();
+        st = conn.prepareStatement(createTableProduct);
+        st.executeUpdate();
+
+        st = conn.prepareStatement("INSERT INTO category (name) VALUES (?)");
+        st.setString(1, "Matinais");
+        st.executeUpdate();
+
+        DB.closeStatement(st);
     }
+
 }

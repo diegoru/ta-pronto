@@ -6,7 +6,7 @@ import br.com.sinqia.db.DB;
 
 public class DaoFactory {
 
-    public static CategoryDAO createCategyDao() {
+    public static CategoryDAO createCategoryDao() {
         return new CategoryDAOImpl(DB.getConnection());
     }
 
