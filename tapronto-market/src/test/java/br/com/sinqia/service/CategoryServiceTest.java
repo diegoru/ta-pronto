@@ -29,7 +29,7 @@ public class CategoryServiceTest {
 
     @Test
     @DisplayName("Deve inserir categoria")
-    public void categoryInsertTest() {
+    public void insertTest() {
         Category category = new Category(1L, "Limpeza");
         service.insert(category);
         verify(dao, times(1)).insert(category);
@@ -42,21 +42,19 @@ public class CategoryServiceTest {
         assertEquals("Unexpected error! No category to insert", runtimeException.getMessage());
     }
 
-    @Test
-    @DisplayName("Deve atualizar uma categoria por id")
-    public void updateTest() {
-        Category category = new Category();
-        category = getCategory();
-        category.setId(1L);
+        @Test
+        @DisplayName("Deve atualizar uma categoria por id")
+        public void updateTest() {
+            Category category = getCategory();
+            category.setId(1L);
 
-        when(dao.findById(anyLong())).thenReturn(category);
+            when(dao.findById(anyLong())).thenReturn(category);
 
-        Category categoryUpdate = category;
-        categoryUpdate.setName("Padaria");
+            category.setName("Padaria");
 
-        service.update(categoryUpdate);
-        verify(dao, times(1)).update(categoryUpdate);
-    }
+            service.update(category);
+            verify(dao, times(1)).update(category);
+        }
 
     @Test
     @DisplayName("Deve lancar categoria nao encontrada update")
