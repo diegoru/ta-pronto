@@ -1,36 +1,34 @@
 package br.com.sinqia.dao.impl;
 
-import br.com.sinqia.dao.CategoryDAO;
+import br.com.sinqia.dao.StockDAO;
 import br.com.sinqia.db.DB;
 import br.com.sinqia.exceptions.DbException;
-import br.com.sinqia.model.Category;
+import br.com.sinqia.model.Stock;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+public class StockDAOImpl implements StockDAO {
 
-public class CategoryDAOImpl implements CategoryDAO {
+    private Connection conn;
 
-    private final Connection conn;
-
-    public CategoryDAOImpl(Connection conn) {
+    public StockDAOImpl(Connection conn) {
         this.conn = conn;
     }
 
     @Override
-    public void insert(Category category) {
+    public void insert(Stock stock) {
         PreparedStatement st = null;
         try {
-            st = conn.prepareStatement("INSERT INTO category (name) VALUES (?)", Statement.RETURN_GENERATED_KEYS);
-            st.setString(1, category.getName());
-
+            st = conn.prepareStatement("INSERT INTO stock (description) VALUES (?)", Statement.RETURN_GENERATED_KEYS);
+            st.setString(1, stock.getDescription());
             int rowsAffected = st.executeUpdate();
             if (rowsAffected > 0) {
                 ResultSet rs = st.getGeneratedKeys();
                 if (rs.next()) {
-                    Long id = rs.getLong(1);
-                    category.setId(id);
+                    long id = rs.getLong(1);
+                    stock.setId(id);
                 }
                 DB.closeResultSet(rs);
             } else {
@@ -44,26 +42,26 @@ public class CategoryDAOImpl implements CategoryDAO {
     }
 
     @Override
-    public void update(Category category) {
+    public void update(Stock stock) {
         PreparedStatement st = null;
         try {
-            st = conn.prepareStatement("UPDATE category SET Name =? WHERE id = ?");
-            st.setString(1, category.getName());
-            st.setLong(2, category.getId());
-
+            st = conn.prepareStatement("UPDATE stock SET description = ? WHERE id = ?");
+            st.setString(1, stock.getDescription());
+            st.setLong(2, stock.getId());
             st.executeUpdate();
         } catch (SQLException e) {
             throw new DbException(e.getMessage());
         } finally {
             DB.closeStatement(st);
         }
+
     }
 
     @Override
     public void deleteById(Long id) {
         PreparedStatement st = null;
         try {
-            st = conn.prepareStatement("DELETE FROM category WHERE id = ?");
+            st = conn.prepareStatement("DELETE FROM stock WHERE id = ?");
             st.setLong(1, id);
             int rowsAffected = st.executeUpdate();
             if (rowsAffected == 0) throw new DbException("Unexpected error! No rows affected!");
@@ -72,22 +70,22 @@ public class CategoryDAOImpl implements CategoryDAO {
         } finally {
             DB.closeStatement(st);
         }
+
     }
 
     @Override
-    public Category findById(Long id) {
+    public Stock findById(Long id) {
         PreparedStatement st = null;
         ResultSet rs = null;
         try {
-            st = conn.prepareStatement("SELECT * FROM category WHERE category.id = ?");
+            st = conn.prepareStatement("SELECT * FROM stock WHERE stock.id = ?");
             st.setLong(1, id);
             rs = st.executeQuery();
-
             if (rs.next()) {
-                Category category = new Category();
-                category.setId(rs.getLong("id"));
-                category.setName(rs.getString("name"));
-                return category;
+                Stock stock = new Stock();
+                stock.setId(rs.getLong("id"));
+                stock.setDescription(rs.getString("description"));
+                return stock;
             }
             return null;
         } catch (SQLException e) {
@@ -99,18 +97,18 @@ public class CategoryDAOImpl implements CategoryDAO {
     }
 
     @Override
-    public List<Category> findAll() {
+    public List<Stock> findAll() {
         PreparedStatement st = null;
         ResultSet rs = null;
         try {
-            st = conn.prepareStatement("SELECT * FROM category ORDER BY name");
+            st = conn.prepareStatement("SELECT * FROM stock ORDER BY description");
             rs = st.executeQuery();
-            List<Category> list = new ArrayList<>();
+            List<Stock> list = new ArrayList<>();
             while (rs.next()) {
-                Category category = new Category();
-                category.setId(rs.getLong("id"));
-                category.setName(rs.getString("name"));
-                list.add(category);
+                Stock stock = new Stock();
+                stock.setId(rs.getLong("id"));
+                stock.setDescription(rs.getString("description"));
+                list.add(stock);
             }
             return list;
         } catch (SQLException e) {

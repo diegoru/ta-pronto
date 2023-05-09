@@ -45,9 +45,10 @@ class CategoryDAOImplTest {
     }
 
     @Test
-    @DisplayName("Deve lancar exception ao deletar categoria pelo id")
+    @DisplayName("Deve lancar uma exception ao deletar categoria pelo id")
     void dbExceptionDeleteById() {
-        assertThrows(DbException.class, () -> dao.deleteById(3L));
+        DbException dbException = assertThrows(DbException.class, () -> dao.deleteById(3L));
+        assertEquals("Unexpected error! No rows affected!", dbException.getMessage());
     }
 
     @Test
@@ -63,12 +64,21 @@ class CategoryDAOImplTest {
     }
 
     public static void initializationDataBase() throws SQLException {
+        PreparedStatement st = null;
+
         String dropTables = "DROP TABLE product, category";
+        st = conn.prepareStatement(dropTables);
+        st.executeUpdate();
+        DB.closeStatement(st);
+
         String createTableCategory =
                 "CREATE TABLE category ( "
                 + "id BIGINT NOT NULL AUTO_INCREMENT, "
                 + "name VARCHAR(60) NOT NULL, "
                 + "PRIMARY KEY (id))";
+        st = conn.prepareStatement(createTableCategory);
+        st.executeUpdate();
+        DB.closeStatement(st);
 
         String createTableProduct =
                 "CREATE TABLE product( " +
@@ -78,20 +88,13 @@ class CategoryDAOImplTest {
                         "category_id BIGINT NOT NULL, " +
                         "PRIMARY KEY (id), " +
                         "FOREIGN KEY (category_id) REFERENCES category (id) )";
-
-        PreparedStatement st = null;
-
-        st = conn.prepareStatement(dropTables);
-        st.executeUpdate();
-        st = conn.prepareStatement(createTableCategory);
-        st.executeUpdate();
         st = conn.prepareStatement(createTableProduct);
         st.executeUpdate();
+        DB.closeStatement(st);
 
         st = conn.prepareStatement("INSERT INTO category (name) VALUES (?)");
         st.setString(1, "Matinais");
         st.executeUpdate();
-
         DB.closeStatement(st);
     }
 
