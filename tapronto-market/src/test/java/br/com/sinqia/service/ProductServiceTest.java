@@ -1,6 +1,8 @@
 package br.com.sinqia.service;
 
 import br.com.sinqia.dao.ProductDAO;
+import br.com.sinqia.exceptions.InsuficientQuantityOfProductException;
+import br.com.sinqia.exceptions.InvalidQuantityException;
 import br.com.sinqia.exceptions.ProductNotFoundException;
 import br.com.sinqia.model.Category;
 import br.com.sinqia.model.Product;
@@ -33,14 +35,14 @@ public class ProductServiceTest {
     public void insertTest() {
         Product product = getProduct();
         product.setId(1L);
-        service.insert(product);
-        verify(dao, times(1)).insert(product);
+        service.save(product);
+        verify(dao, times(1)).save(product);
     }
 
     @Test
     @DisplayName("Deve lancar erro produto nulo")
     public void shouldNotInsertAProductNull() {
-        RuntimeException runtimeException = assertThrows(RuntimeException.class, () -> service.insert(null));
+        RuntimeException runtimeException = assertThrows(RuntimeException.class, () -> service.save(null));
         assertEquals("Unexpected error! No product to insert", runtimeException.getMessage());
     }
 
@@ -121,6 +123,71 @@ public class ProductServiceTest {
 
     }
 
+    @Test
+    @DisplayName("Deve Adicionar quantidade ao estoque do produto pelo id")
+    public void addQuantityToProductByIdTest() {
+        int quantity = 5;
+        Product product = getProduct();
+        product.setId(1L);
+        when(dao.findById(anyLong())).thenReturn(product);
+        product.setQuantity(product.getQuantity() + quantity);
+        service.addQuantityToProductById(1L, quantity);
+        verify(dao, times(1)).update(product);
+    }
+
+    @Test
+    @DisplayName("Deve lancar erro quantidade invalida ao adicionar quantidade ao produto")
+    public void exceptionInvalidQuantityToAddQuantity() {
+        InvalidQuantityException exception = assertThrows(InvalidQuantityException.class, () -> service.addQuantityToProductById(1L, 0));
+        assertEquals("Invalid quantity", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Deve lancar erro adicionar quantidade produto nulo")
+    public void exceptionAddQuantityToProductNull() {
+        when(dao.findById(anyLong())).thenReturn(nullable(Product.class));
+        ProductNotFoundException exception = assertThrows(ProductNotFoundException.class, () -> service.addQuantityToProductById(1L, 15));
+        assertEquals("Product not found", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Deve reduzir quantidade estoque por id ")
+    public void reduceQuantityToProductByIdTest() {
+        int quantity = 3;
+        Product product = getProduct();
+        product.setId(1L);
+        when(dao.findById(anyLong())).thenReturn(product);
+        product.setQuantity(product.getQuantity() - quantity);
+        service.reduceQuantityToProductById(1L, quantity);
+        verify(dao, times(1)).update(product);
+    }
+
+    @Test
+    @DisplayName("Deve lancar erro quantidade invalida ao tentar remover quantidade ao produto")
+    public void exceptionInvalidQuantityToReduceQuantity() {
+        InvalidQuantityException exception = assertThrows(InvalidQuantityException.class, () -> service.reduceQuantityToProductById(1L, 0));
+        assertEquals("Invalid quantity", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Deve lancar erro reduzir quantidade produto nulo")
+    public void exceptionReduceQuantityToProductNull() {
+        when(dao.findById(anyLong())).thenReturn(nullable(Product.class));
+        ProductNotFoundException exception = assertThrows(ProductNotFoundException.class, () -> service.reduceQuantityToProductById(1L, 5));
+        assertEquals("Product not found", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Deve lancar erro reduzir quantidade maior que estoque")
+    public void exceptionInvalidQuantityReduceQuantity() {
+        int quantity = 15;
+        Product product = getProduct();
+        product.setId(1L);
+        when(dao.findById(anyLong())).thenReturn(product);
+        InsuficientQuantityOfProductException exception = assertThrows(InsuficientQuantityOfProductException.class, () -> service.reduceQuantityToProductById(1L, quantity));
+        assertEquals("Insufficient quantity of product in stock", exception.getMessage());
+    }
+
     public static Product getProduct() {
         Category category = new Category(1L, "Matinais");
 
@@ -128,6 +195,7 @@ public class ProductServiceTest {
         product.setName("Bolacha trakinas");
         product.setPrice(new BigDecimal("4.50"));
         product.setCategory(category);
+        product.setQuantity(10);
         return product;
     }
 

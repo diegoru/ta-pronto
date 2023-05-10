@@ -19,7 +19,7 @@ public class CategoryDAOImpl implements CategoryDAO {
     }
 
     @Override
-    public void insert(Category category) {
+    public void save(Category category) {
         PreparedStatement st = null;
         try {
             st = conn.prepareStatement("INSERT INTO category (name) VALUES (?)", Statement.RETURN_GENERATED_KEYS);

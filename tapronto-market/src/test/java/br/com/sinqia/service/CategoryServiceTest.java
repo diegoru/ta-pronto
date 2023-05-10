@@ -31,15 +31,15 @@ public class CategoryServiceTest {
     @DisplayName("Deve inserir categoria")
     public void insertTest() {
         Category category = new Category(1L, "Limpeza");
-        service.insert(category);
-        verify(dao, times(1)).insert(category);
+        service.save(category);
+        verify(dao, times(1)).save(category);
     }
 
     @Test
     @DisplayName("Deve lancar erro categoria nula")
     public void shouldNotInsertACategoryNull() {
-        RuntimeException runtimeException = assertThrows(RuntimeException.class, () -> service.insert(null));
-        assertEquals("Unexpected error! No category to insert", runtimeException.getMessage());
+        RuntimeException runtimeException = assertThrows(RuntimeException.class, () -> service.save(null));
+        assertEquals("Unexpected error! No category to save", runtimeException.getMessage());
     }
 
         @Test

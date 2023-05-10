@@ -21,20 +21,21 @@ public class ProductDAOImpl implements ProductDAO {
     }
 
     @Override
-    public void insert(Product product) {
+    public void save(Product product) {
         PreparedStatement st = null;
 
         try {
             st = conn.prepareStatement(
                     "INSERT INTO product "
-                            + "(name, price, category_id) "
+                            + "(name, price, quantity, category_id) "
                             + "VALUES "
-                            + "(?, ?, ?)", Statement.RETURN_GENERATED_KEYS
+                            + "(?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS
             );
 
             st.setString(1, product.getName());
             st.setBigDecimal(2, product.getPrice());
-            st.setLong(3, product.getCategory().getId());
+            st.setInt(3, product.getQuantity());
+            st.setLong(4, product.getCategory().getId());
 
             int rowsAffected = st.executeUpdate();
 
@@ -110,11 +111,11 @@ public class ProductDAOImpl implements ProductDAO {
                 Category category = new Category(
                         rs.getLong("category_id"),
                         rs.getString("CatName"));
-                Product product = new Product(
-                        rs.getLong("id"),
-                        rs.getString("name"),
-                        rs.getBigDecimal("price"),
-                        category);
+                Product product = new Product();
+                        product.setId(rs.getLong("id"));
+                        product.setName(rs.getString("name"));
+                        product.setPrice(rs.getBigDecimal("price"));
+                        product.setCategory(category);
                 return product;
             }
             return null;
@@ -147,11 +148,11 @@ public class ProductDAOImpl implements ProductDAO {
                     category = new Category(rs.getLong("category_id"), rs.getString("CatName"));
                     map.put(rs.getLong("category_id"), category);
                 }
-                Product product = new Product(
-                        rs.getLong("id"),
-                        rs.getString("name"),
-                        rs.getBigDecimal("price"),
-                        category);
+                Product product = new Product();
+                        product.setId(rs.getLong("id"));
+                        product.setName(rs.getString("name"));
+                        product.setPrice(rs.getBigDecimal("price"));
+                        product.setCategory(category);
                 list.add(product);
             }
             return list;
@@ -185,11 +186,12 @@ public class ProductDAOImpl implements ProductDAO {
                     cat = new Category(rs.getLong("category_id"), rs.getString("CatName"));
                     map.put(rs.getLong("category_id"), cat);
                 }
-                Product product = new Product(
-                        rs.getLong("id"),
-                        rs.getString("name"),
-                        rs.getBigDecimal("price"),
-                        cat);
+                Product product = new Product();
+                        product.setId(rs.getLong("id"));
+                        product.setName(rs.getString("name"));
+                        product.setPrice(rs.getBigDecimal("price"));
+                        product.setQuantity(rs.getInt("quantity"));
+                        product.setCategory(cat);
                 list.add(product);
             }
             return list;
@@ -199,6 +201,5 @@ public class ProductDAOImpl implements ProductDAO {
             DB.closeStatement(st);
             DB.closeResultSet(rs);
         }
-
     }
 }

@@ -13,9 +13,9 @@ public class CategoryServiceImpl implements CategoryService {
 
 
     @Override
-    public void insert(Category category) {
-        if (category == null) throw new RuntimeException("Unexpected error! No category to insert");
-        categoryDAO.insert(category);
+    public void save(Category category) {
+        if (category == null) throw new RuntimeException("Unexpected error! No category to save");
+        categoryDAO.save(category);
     }
 
     @Override
