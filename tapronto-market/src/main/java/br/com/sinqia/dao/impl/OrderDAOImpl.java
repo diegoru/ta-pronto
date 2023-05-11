@@ -55,7 +55,7 @@ public class OrderDAOImpl implements OrderDAO {
                 order.setCreatedAt(rs.getDate("created_at").toLocalDate());
                 return Optional.of(order);
             }
-            return null;
+            return Optional.empty();
         } catch (SQLException e) {
             throw new DbException(e.getMessage());
         } finally {

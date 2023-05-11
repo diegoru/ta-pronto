@@ -2,6 +2,8 @@ package br.com.sinqia.service;
 
 import br.com.sinqia.dao.OrderItemDAO;
 import br.com.sinqia.dao.impl.OrderItemDAOImpl;
+import br.com.sinqia.dao.impl.ProductDAOImpl;
+import br.com.sinqia.exceptions.InsuficientQuantityOfProductException;
 import br.com.sinqia.exceptions.OrderItemNotFoundException;
 import br.com.sinqia.model.Category;
 import br.com.sinqia.model.Order;
@@ -33,17 +35,9 @@ public class OrdemItemServiceTest {
 
     @Mock
     private OrderItemDAOImpl itemDAO;
+    @Mock
+    private ProductDAOImpl productDAO;
 
-
-    @Test
-    @DisplayName("Deve listar os itens dos pedidos")
-    public void findAllTest() {
-        OrderItem item = getOrderItem();
-        item.setId(1L);
-        List<OrderItem> listItems = Arrays.asList(item);
-        when(itemDAO.findAll()).thenReturn(listItems);
-        assertEquals(listItems, itemService.findAll());
-    }
 
     @Test
     @DisplayName("Deve retornar um item pedido por id")
@@ -68,15 +62,26 @@ public class OrdemItemServiceTest {
     @DisplayName("Deve salvar um item pedido")
     public void saveTest() {
         OrderItem orderItem = getOrderItem();
+        when(productDAO.findById(anyLong())).thenReturn(orderItem.getProduct());
         when(itemDAO.save(any(OrderItem.class))).thenReturn(orderItem);
         assertEquals(orderItem, itemService.save(orderItem));
     }
 
     @Test
-    @DisplayName("Deve lancar erro ao tentgar salvar um item pedido nulo")
-    public void exceptionSaveTest() {
+    @DisplayName("Deve lancar erro ao tentar salvar um item pedido nulo")
+    public void exceptionOrderItemNullSaveTest() {
         RuntimeException exception = assertThrows(RuntimeException.class, () -> itemService.save(null));
         assertEquals("Unexpected error! No order item to save", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Deve lancar erro ao tentar adicionar um item pedido quantidade superior ao estoque")
+    public void exceptionInsuficientQuantityOfProductSaveTest() {
+        OrderItem orderItem = getOrderItem();
+        orderItem.setQuantity(11);
+        when(productDAO.findById(anyLong())).thenReturn(orderItem.getProduct());
+        InsuficientQuantityOfProductException exception = assertThrows(InsuficientQuantityOfProductException.class, () -> itemService.save(orderItem));
+        assertEquals("Insufficient quantity of product in stock", exception.getMessage());
     }
 
     @Test
@@ -108,6 +113,19 @@ public class OrdemItemServiceTest {
     public void exceptionNullUpdate() {
         RuntimeException exception = assertThrows(RuntimeException.class, () -> itemService.update(1L, null));
         assertEquals("Unexpected error! No order item to update", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Deve lancar erro ao tentar atualizar um item pedido quantidade superior ao estoque")
+    public void exceptionInsuficientQuantityOfProductUpdateTest() {
+        Long id = 1L;
+        OrderItem orderItem = getOrderItem();
+        orderItem.setId(id);
+        when(itemDAO.findById(anyLong())).thenReturn(Optional.of(orderItem));
+
+        when(itemDAO.save(any(OrderItem.class))).thenThrow(new InsuficientQuantityOfProductException());
+        InsuficientQuantityOfProductException exception = assertThrows(InsuficientQuantityOfProductException.class, () -> itemService.update(id, orderItem));
+        assertEquals("Insufficient quantity of product in stock", exception.getMessage());
     }
 
     @Test

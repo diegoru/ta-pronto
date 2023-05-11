@@ -16,8 +16,8 @@ public class ProductTest {
         System.out.println("==== Product, save ====");
         Category category = categoryDAO.findById(2L);
         Product product = new Product();
-        product.setName("Torrada");
-        product.setPrice(new BigDecimal("7.0"));
+        product.setName("Leite Ninho");
+        product.setPrice(new BigDecimal("5.6"));
         product.setQuantity(4);
         product.setCategory(category);
         productDAO.save(product);

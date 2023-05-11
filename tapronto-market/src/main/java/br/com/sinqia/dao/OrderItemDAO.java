@@ -10,4 +10,5 @@ public interface OrderItemDAO {
     Optional<OrderItem> findById(Long id);
     OrderItem save(OrderItem item);
     void deleteById(Long id);
+    List<OrderItem> findItemByOrderId(Long idPedido);
 }
