@@ -30,10 +30,10 @@ public class OrderItemDAOImpl implements OrderItemDAO {
         try {
             st = conn.prepareStatement(
                     "SELECT order_item.*, orders.created_at as created, " +
-                            "product.name as prodName, product.price as prodPrice, product.category_id as catId " +
-                            "FROM order_item INNER JOIN orders ON order_item.order_id = orders.id " +
-                            "INNER JOIN product ON order_item.product_id = product.id " +
-                            "WHERE order_item.id =  ?"
+                        "product.name as prodName, product.price as prodPrice, product.category_id as catId " +
+                        "FROM order_item INNER JOIN orders ON order_item.order_id = orders.id " +
+                        "INNER JOIN product ON order_item.product_id = product.id " +
+                        "WHERE order_item.id =  ?"
             );
             st.setLong(1, id);
             rs = st.executeQuery();

@@ -25,4 +25,8 @@ public class DaoFactory {
     public static CashierDAO createCashierDAO() {
         return new CashierDAOImpl(DB.getConnection());
     }
+
+    public static RegisterDAO createRegisterDAO() {
+        return new RegisterDAOImpl(DB.getConnection());
+    }
 }
