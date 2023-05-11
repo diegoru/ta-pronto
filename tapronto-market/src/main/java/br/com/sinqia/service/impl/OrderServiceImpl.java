@@ -36,6 +36,7 @@ public class OrderServiceImpl implements OrderService {
         resulFindtOrder.orElseThrow(OrderNotFoundException::new);
         Order getOrder = resulFindtOrder.get();
         getOrder.setCreatedAt(order.getCreatedAt());
+        getOrder.setAmount(order.getAmount());
         getOrder.setItems(order.getItems());
         return orderDAO.save(order);
     }

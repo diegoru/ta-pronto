@@ -1,39 +1,39 @@
 package br.com.sinqia.dao.impl;
 
-import br.com.sinqia.dao.OrderDAO;
+import br.com.sinqia.dao.CashierDAO;
 import br.com.sinqia.db.DB;
 import br.com.sinqia.exceptions.DbException;
-import br.com.sinqia.model.Order;
+import br.com.sinqia.model.Cashier;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class OrderDAOImpl implements OrderDAO {
+public class CashierDAOImpl implements CashierDAO {
 
-    private final Connection conn;
+    private Connection conn;
 
-    public OrderDAOImpl(Connection conn) {
+    public CashierDAOImpl(Connection conn) {
         this.conn = conn;
     }
 
     @Override
-    public List<Order> findAll() {
+    public List<Cashier> findAll() {
         PreparedStatement st = null;
         ResultSet rs = null;
         try {
-            st = conn.prepareStatement("SELECT * FROM orders ORDER BY created_at");
+            st = conn.prepareStatement("SELECT * FROM cashier");
             rs = st.executeQuery();
-            List<Order> list = new ArrayList<>();
+
+            List<Cashier> list = new ArrayList<>();
+
             while (rs.next()) {
-                Order order = new Order();
-                order.setId(rs.getLong("id"));
-                order.setCreatedAt(rs.getDate("created_at").toLocalDate());
-                order.setAmount(rs.getBigDecimal("total"));
-                list.add(order);
+                Cashier cashier = new Cashier(rs.getLong("id"), rs.getBoolean("open"));
+                list.add(cashier);
             }
             return list;
+
         } catch (SQLException e) {
             throw new DbException(e.getMessage());
         } finally {
@@ -43,19 +43,17 @@ public class OrderDAOImpl implements OrderDAO {
     }
 
     @Override
-    public Optional<Order> findById(Long id) {
+    public Optional<Cashier> findById(Long id) {
         PreparedStatement st = null;
         ResultSet rs = null;
         try {
-            st = conn.prepareStatement("SELECT * FROM orders WHERE orders.id = ?");
+            st = conn.prepareStatement("SELECT * FROM cashier WHERE cashier.id = ?");
             st.setLong(1, id);
             rs = st.executeQuery();
+
             if (rs.next()) {
-                Order order = new Order();
-                order.setId(rs.getLong("id"));
-                order.setCreatedAt(rs.getDate("created_at").toLocalDate());
-                order.setAmount(rs.getBigDecimal("total"));
-                return Optional.of(order);
+                Cashier cashier = new Cashier(rs.getLong("id"), rs.getBoolean("open"));
+                return Optional.of(cashier);
             }
             return Optional.empty();
         } catch (SQLException e) {
@@ -67,20 +65,18 @@ public class OrderDAOImpl implements OrderDAO {
     }
 
     @Override
-    public Order save(Order order) {
+    public Cashier save(Cashier cashier) {
         PreparedStatement st = null;
         try {
-            st = conn.prepareStatement("INSERT INTO orders (created_at, total) VALUES (?, ?)", Statement.RETURN_GENERATED_KEYS);
-            st.setDate(1, Date.valueOf(order.getCreatedAt()));
-            st.setBigDecimal(2, order.getAmount());
-
+            st = conn.prepareStatement("INSERT INTO cashier (open) VALUES (?)", Statement.RETURN_GENERATED_KEYS);
+            st.setBoolean(1, cashier.isOpen());
             int rowsAffected = st.executeUpdate();
             if (rowsAffected > 0) {
                 ResultSet rs = st.getGeneratedKeys();
                 if (rs.next()) {
                     Long id = rs.getLong(1);
-                    order.setId(id);
-                    return order;
+                    cashier.setId(id);
+                    return cashier;
                 }
                 DB.closeResultSet(rs);
             }else {
@@ -95,10 +91,10 @@ public class OrderDAOImpl implements OrderDAO {
     }
 
     @Override
-    public void deleteById(Long id) {
+    public void deletebyId(Long id) {
         PreparedStatement st = null;
         try {
-            st = conn.prepareStatement("DELETE FROM orders WHERE orders.id = ?");
+            st = conn.prepareStatement("DELETE FROM cashier WHERE cashier.id = ?");
             st.setLong(1, id);
             int rowsAffected = st.executeUpdate();
             if (rowsAffected == 0) throw new DbException("Unexpected error! No rows affected!");

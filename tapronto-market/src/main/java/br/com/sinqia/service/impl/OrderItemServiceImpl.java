@@ -8,6 +8,7 @@ import br.com.sinqia.model.OrderItem;
 import br.com.sinqia.model.Product;
 import br.com.sinqia.service.OrderItemService;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 public class OrderItemServiceImpl implements OrderItemService {
@@ -27,6 +28,8 @@ public class OrderItemServiceImpl implements OrderItemService {
         if (orderItem == null) throw new RuntimeException("Unexpected error! No order item to save");
         Product product = productDAO.findById(orderItem.getProduct().getId());
         if (orderItem.getQuantity() > product.getQuantity()) throw new InsuficientQuantityOfProductException();
+        BigDecimal amount = calculateTotalOrder(orderItem);
+        orderItem.getOrder().setAmount(amount);
         return itemDAO.save(orderItem);
     }
 
@@ -50,5 +53,13 @@ public class OrderItemServiceImpl implements OrderItemService {
         Optional<OrderItem> orderItem = itemDAO.findById(id);
         orderItem.orElseThrow(OrderItemNotFoundException::new);
         itemDAO.deleteById(id);
+    }
+
+    private BigDecimal calculateTotalOrder(OrderItem orderItem) {
+        BigDecimal valorAtual = orderItem.getOrder().getAmount();
+        BigDecimal precoProduto = orderItem.getProduct().getPrice();
+        BigDecimal quantidade = new BigDecimal(orderItem.getQuantity());
+        BigDecimal amount = precoProduto.multiply(quantidade);
+        return amount;
     }
 }

@@ -11,7 +11,7 @@ public class OrderItemTest {
         OrderDAO orderDAO = DaoFactory.createOrderDAO();
         OrderItemDAO itemDAO = DaoFactory.createOrderItemDAO();
 
-        System.out.println("=== OrderItem, findItem ===");
+        System.out.println("=== OrderItem, findItemByOrderId ===");
         itemDAO.findItemByOrderId(1L).forEach(System.out::println);
 
         System.out.println("\n=== OrderItem, findById ===");
@@ -24,6 +24,7 @@ public class OrderItemTest {
         OrderItem save = itemDAO.save(orderItem);
         System.out.println(save);
 
-
+        System.out.println("\n=== OrderItem, delete ===");
+        itemDAO.deleteById(2L);
     }
 }
