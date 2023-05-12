@@ -6,16 +6,14 @@ import br.com.sinqia.exceptions.DbException;
 import br.com.sinqia.model.Cashier;
 import br.com.sinqia.model.Register;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 public class RegisterDAOImpl implements RegisterDAO {
-    private Connection conn;
+    private final Connection conn;
 
     public RegisterDAOImpl(Connection conn) {
         this.conn = conn;
@@ -70,16 +68,54 @@ public class RegisterDAOImpl implements RegisterDAO {
             DB.closeStatement(st);
             DB.closeResultSet(rs);
         }
-        return Optional.empty();
     }
 
     @Override
     public Register save(Register register) {
-        return null;
+        PreparedStatement st = null;
+        try {
+            st = conn.prepareStatement(
+                    "INSERT INTO register (date_time, opening_balance, closed_balance, cashier_id) " +
+                            "VALUES (?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS
+            );
+
+            st.setTimestamp(1, Timestamp.valueOf(register.getDateTime()));
+            st.setBigDecimal(2, register.getOpeningBalance());
+            st.setBigDecimal(3, register.getClosedBalance());
+            st.setLong(4, register.getCashier().getId());
+            int rowsAffected = st.executeUpdate();
+            if (rowsAffected > 0) {
+                ResultSet rs = st.getGeneratedKeys();
+                if (rs.next()) {
+                    long id = rs.getLong(1);
+                    register.setId(id);
+                    return register;
+                }
+                DB.closeResultSet(rs);
+            } else {
+                throw new DbException("Unexpected error! No rows affected!");
+            }
+            return null;
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        } finally {
+            DB.closeStatement(st);
+        }
     }
 
     @Override
     public void deleteById(Long id) {
+        PreparedStatement st = null;
+        try {
+            st = conn.prepareStatement("DELETE FROM register WHERE register.id = ?");
+            st.setLong(1, id);
+            int rowsAffected = st.executeUpdate();
+            if (rowsAffected == 0) throw new DbException("Unexpected error! No rows affected");
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        } finally {
+            DB.closeStatement(st);
+        }
     }
 
     private Cashier createCashier(ResultSet rs) throws SQLException {
@@ -89,13 +125,13 @@ public class RegisterDAOImpl implements RegisterDAO {
         return cashier;
     }
 
-    private Register createRegister(ResultSet rs, Cashier cashier) {
+    private Register createRegister(ResultSet rs, Cashier cashier) throws SQLException {
         Register register = new Register();
         register.setId(rs.getLong("id"));
         register.setDateTime(rs.getTimestamp("date_time").toLocalDateTime());
-        Cashier cashier = createCashier(rs);
         register.setCashier(cashier);
         register.setOpeningBalance(rs.getBigDecimal("opening_balance"));
         register.setOpeningBalance(rs.getBigDecimal("closed_balance"));
+        return register;
     }
 }
