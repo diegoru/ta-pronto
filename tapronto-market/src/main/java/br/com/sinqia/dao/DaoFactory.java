@@ -29,4 +29,8 @@ public class DaoFactory {
     public static RegisterDAO createRegisterDAO() {
         return new RegisterDAOImpl(DB.getConnection());
     }
+
+    public static RegisterOrderDAO createRegisterOrderDAO() {
+        return new RegisterOrderDAOImpl(DB.getConnection());
+    }
 }
