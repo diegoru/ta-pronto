@@ -5,9 +5,9 @@ import br.com.sinqia.model.Category;
 import java.util.List;
 
 public interface CategoryService {
-    void save(Category category);
-    void update(Category category);
-    void deleteById(Long id);
-    Category findById(Long id);
     List<Category> findAll();
+    Category findById(Long id);
+    Category save(Category category);
+    Category update(Long id, Category category);
+    void deleteById(Long id);
 }

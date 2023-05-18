@@ -151,7 +151,7 @@ public class OrderItemDAOImpl implements OrderItemDAO {
     }
 
     private Category createCategory(Long catId) {
-        Category category = categoryDAO.findById(catId);
+        Category category = categoryDAO.findById(catId).get();
         return category;
     }
 

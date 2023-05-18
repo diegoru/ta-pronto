@@ -2,10 +2,12 @@ package br.com.sinqia.service.impl;
 
 import br.com.sinqia.dao.CategoryDAO;
 import br.com.sinqia.exceptions.CategoryNotFoundException;
+import br.com.sinqia.exceptions.DbException;
 import br.com.sinqia.model.Category;
 import br.com.sinqia.service.CategoryService;
 
 import java.util.List;
+import java.util.Optional;
 
 public class CategoryServiceImpl implements CategoryService {
 
@@ -13,31 +15,32 @@ public class CategoryServiceImpl implements CategoryService {
 
 
     @Override
-    public void save(Category category) {
+    public Category findById(Long id) {
+        Optional<Category> optionalCategory = categoryDAO.findById(id);
+        optionalCategory.orElseThrow(CategoryNotFoundException::new);
+        return optionalCategory.get();
+    }
+    @Override
+    public Category save(Category category) {
         if (category == null) throw new RuntimeException("Unexpected error! No category to save");
-        categoryDAO.save(category);
+        return categoryDAO.save(category);
     }
 
     @Override
-    public void update(Category category) {
-        Category getCategory = categoryDAO.findById(category.getId());
-        if (getCategory == null) throw new CategoryNotFoundException();
-        categoryDAO.update(category);
+    public Category update(Long id, Category category) {
+        if (category == null) throw new DbException("Unexpected error! No category to update");
+        Optional<Category> optionalCategory = categoryDAO.findById(id);
+        optionalCategory.orElseThrow(CategoryNotFoundException::new);
+        return categoryDAO.save(optionalCategory.get());
     }
 
     @Override
     public void deleteById(Long id) {
-        Category category = categoryDAO.findById(id);
-        if (category == null) throw new CategoryNotFoundException();
+        categoryDAO.findById(id).orElseThrow(CategoryNotFoundException::new);
         categoryDAO.deleteById(id);
     }
 
-    @Override
-    public Category findById(Long id) {
-        Category category = categoryDAO.findById(id);
-        if (category == null) throw new CategoryNotFoundException();
-        return category;
-    }
+
 
     @Override
     public List<Category> findAll() {

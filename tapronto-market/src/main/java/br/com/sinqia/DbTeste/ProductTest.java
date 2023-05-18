@@ -14,7 +14,7 @@ public class ProductTest {
         CategoryDAO categoryDAO = DaoFactory.createCategoryDao();
 
         System.out.println("==== Product, save ====");
-        Category category = categoryDAO.findById(2L);
+        Category category = categoryDAO.findById(2L).get();
         Product product = new Product();
         product.setName("Leite Ninho");
         product.setPrice(new BigDecimal("5.6"));
